@@ -1,0 +1,7 @@
+<section class="chud-section" id="chud-buddy" aria-labelledby="chud-buddy-h"{% if oob %} hx-swap-oob="true"{% endif %}>
+  <h2 class="chud-label" id="chud-buddy-h">CHUD buddy</h2>
+  {% if not chud.buddy_now and chud.first_buddy %}<p class="muted">{{ chud.first_buddy.name }} joins you at level {{ chud.first_buddy.level }}.</p>{% endif %}
+  <div class="chud-buddies">
+    {% for b in chud.buddy_grid %}<form method="post" action="{% url 'chud:buddy' %}" data-write="keep" data-label="Choose {{ b.name }}"><input type="hidden" name="buddy" value="{{ b.id }}"><button type="submit" class="chud-buddies__one{% if b.active %} is-active{% endif %}" aria-pressed="{% if b.active %}true{% else %}false{% endif %}" aria-label="{{ b.aria }}"{% if b.locked %} disabled{% endif %}>{% if b.locked %}<svg class="chud-buddy-hint" width="44" height="44" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="{{ b.head }}" stroke="#3A3D44" stroke-width="1.5" stroke-linejoin="round"/><text x="12" y="15.500" text-anchor="middle" font-size="8" font-weight="700" font-family="inherit" fill="#5A5E66">?</text></svg>{% else %}{% include "chud/_buddy.html" with size=44 %}{% endif %}{{ b.caption }}</button></form>{% endfor %}
+  </div>
+</section>

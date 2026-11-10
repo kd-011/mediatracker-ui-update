@@ -1,0 +1,45 @@
+{% extends "core/shell.html" %}
+{% load ui catalogue tracking %}
+{% block title %}{% if is_self %}You{% else %}{{ owner.name }}{% endif %} · MediaTracker{% endblock %}
+{% block content %}
+<div class="stack me">
+  <div class="me__head">
+    <div class="me__avatar me__avatar--large" aria-hidden="true">{% if owner.avatar_path %}<img src="{{ owner.avatar_url }}" alt="" width="96" height="96">{% else %}{{ owner.initial }}{% endif %}</div>
+    <div class="me__who">
+      <h1 class="h1 h1--small">{{ owner.name }}</h1>
+      <span class="muted">@{{ owner.username }}</span>
+      <div class="me__stats" aria-label="Stats">
+        <span class="me__stat"><span class="me__stat-value">{% if sharing %}{{ counts.library }}{% else %}–{% endif %}</span><span class="me__stat-label">logged</span></span>
+        <span class="me__stat" id="stat-followers-{{ owner.username }}"><span class="me__stat-value">{{ follows.followers }}</span><span class="me__stat-label">followers</span></span>
+        <span class="me__stat" id="stat-following-{{ owner.username }}"><span class="me__stat-value">{{ follows.following }}</span><span class="me__stat-label">following</span></span>
+      </div>
+    </div>
+    {% if not is_self %}{% include "social/_follow_button.html" with target=owner %}{% endif %}
+  </div>
+  {% if chud %}{% include "chud/_highlights.html" %}{% endif %}
+  {% if not sharing %}
+  {% include "core/components/empty.html" with icon="user" line=owner.name|add:" keeps their Library and posts private." %}
+  {% else %}
+  <div class="me__tabs" role="tablist">
+    <button type="button" class="me__tab is-active" role="tab" aria-selected="true" data-tab="posts">Posts</button>
+    <button type="button" class="me__tab" role="tab" aria-selected="false" data-tab="favourites">Favourites</button>
+    <button type="button" class="me__tab" role="tab" aria-selected="false" data-tab="stats">Stats</button>
+  </div>
+  <div class="me__tab-panel is-active" data-panel="posts">
+    {% if cards %}<div class="me__grid" data-grid>{% include "social/_post_grid.html" %}</div>{% else %}<p class="muted" style="padding: 24px 16px">{% if is_self %}Nothing posted yet. Finish something and choose Post.{% else %}No posts yet.{% endif %}</p>{% endif %}
+  </div>
+  <div class="me__tab-panel" data-panel="stats">
+    <ul class="profile-stats">
+      <li><span>Movies</span><b>{{ stats.movies }}</b></li>
+      <li><span>Episodes</span><b>{{ stats.episodes }}</b></li>
+      <li><span>Average score</span><b>{% if stats.avg_score %}{{ stats.avg_score|floatformat:1 }}<span class="profile-stats__of">/10</span>{% else %}–{% endif %}</b></li>
+      <li><a href="{% url 'social:profile_library' owner.username %}"><span>Library</span><b>{{ counts.library }} ›</b></a></li>
+      <li><span>Watchlist</span><b>{{ counts.watchlist }}</b></li>
+    </ul>
+  </div>
+  <div class="me__tab-panel" data-panel="favourites">
+    {% if favourites %}<div class="me__grid">{% for entry in favourites %}{% title_of entry.media as shown %}<a class="me__grid-item" href="{% url 'catalogue:title' entry.media_id %}" aria-label="{{ shown }}">{% if entry.media.poster_key %}<img data-poster src="{% poster_src entry.media.poster_key %}" alt="{{ shown }}" loading="lazy" decoding="async">{% endif %}{% if entry.score %}<span class="me__grid-badge me__grid-badge--stars">{{ entry.score|stars }}</span>{% endif %}</a>{% endfor %}</div>{% else %}<p class="muted" style="padding: 24px 16px">{% if is_self %}Rate things to fill this in.{% else %}Nothing rated yet.{% endif %}</p>{% endif %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

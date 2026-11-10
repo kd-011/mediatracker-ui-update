@@ -1,0 +1,39 @@
+{% load ui %}<section class="chud-meter" aria-label="CHUD level">
+  {% if chud.crowned %}<p class="chud-crown">{% icon "crown" 18 %}Chud of the Week</p>{% endif %}
+  <div class="chud-meter__hero">
+    <div class="chud-meter__text">
+      <div class="chud-meter__head">
+        <span class="chud-meter__level"><span class="sr">CHUD level {{ chud.level }}</span><span aria-hidden="true"><b class="chud-meter__chud">CHUD</b> level {{ chud.level }}</span></span>
+        {% if chud.mine %}{% include "chud/_points.html" with points=chud.points points_text=chud.points_text %}{% endif %}
+      </div>
+      <div class="chud-meter__bar" aria-hidden="true"><span style="width: {{ chud.percent }}%"></span></div>
+      {% if chud.mine %}<span class="chud-meter__line">{{ chud.xp_line }}</span>{% endif %}
+    </div>
+    {% if chud.buddy_now %}<div class="chud-meter__buddy">{% include "chud/_buddy.html" with b=chud.buddy_now size=96 %}</div>{% endif %}
+  </div>
+</section>
+{% if chud.mine %}
+{% include "chud/_buddy_section.html" %}
+<section class="chud-section" aria-labelledby="chud-stickers-h">
+  <h2 class="chud-label" id="chud-stickers-h">Stickers</h2>
+  {% if chud.owned %}<div class="chud-owned">{% for k in chud.owned %}<span class="chud-owned__one" aria-label="{{ k.aria }}">{% include "chud/_sticker.html" with size=40 %}{{ k.count }}</span>{% endfor %}</div>{% else %}<p class="muted">No stickers yet.</p>{% endif %}
+</section>
+{% if chud.bounties_on_me or chud.bounties_i_set %}
+<div id="chud-bounties">
+  <div class="chud-bounties">
+  {% for bounty in chud.bounties_on_me %}{% load catalogue %}{% title_of bounty.media as shown %}{% include "chud/_bounty_card.html" with bounty=bounty %}{% endfor %}
+  {% for bounty in chud.bounties_i_set %}{% title_of bounty.media as shown %}{% include "chud/_bounty_card.html" with bounty=bounty sent=True %}{% endfor %}
+  </div>
+</div>
+{% else %}<div id="chud-bounties" hidden></div>{% endif %}
+<section class="chud-section chud-activity" aria-labelledby="chud-activity-h">
+  <h2 class="chud-label" id="chud-activity-h">CHUD activity</h2>
+  {% for row in chud.activity %}{% if forloop.counter0 < 4 %}<div class="chud-activity__row"><span>{{ row.text }}</span><span class="chud-activity__amount chud-activity__amount--{{ row.tone }}">{{ row.amount }}</span></div>{% endif %}{% empty %}{% if not chud.bounties_on_me and not chud.bounties_i_set %}<p class="muted">Nothing yet. Log something.</p>{% endif %}{% endfor %}
+  {% if chud.activity|length > 4 %}<div class="chud-activity__extra" data-activity-extra hidden>{% for row in chud.activity %}{% if forloop.counter0 >= 4 %}<div class="chud-activity__row"><span>{{ row.text }}</span><span class="chud-activity__amount chud-activity__amount--{{ row.tone }}">{{ row.amount }}</span></div>{% endif %}{% endfor %}</div>
+  <button type="button" class="chud-activity__more" data-activity-more>Show more</button>{% endif %}
+</section>
+{% elif chud.buddy_now %}
+<section class="chud-section" aria-label="CHUD buddy">
+  <div class="chud-buddy-now">{% include "chud/_buddy.html" with b=chud.buddy_now size=72 %}<div class="chud-buddy-now__who"><span class="chud-buddy-now__name">{{ chud.buddy_now.name }}</span><span class="chud-meter__line">Trophy from level {{ chud.buddy_now.level }}</span></div></div>
+</section>
+{% endif %}

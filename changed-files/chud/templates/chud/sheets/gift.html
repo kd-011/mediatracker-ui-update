@@ -1,0 +1,14 @@
+{% extends "core/components/sheet.html" %}
+{% block sheet_title %}Send {{ recipient.name }} a sticker{% endblock %}
+{% block sheet_body %}
+<span class="chud-meter__points{% if points < 0 %} is-negative{% endif %}">{{ points_text }}</span>
+{% if blocked %}<p class="chud-blocked" role="status">{{ blocked }} A sticker you own still sends.</p>{% endif %}
+<div class="chud-gift">
+  {% for k in rows %}<div class="chud-row chud-row--sheet">
+    {% include "chud/_sticker.html" with size=44 %}
+    <div class="chud-row__text"><span class="chud-row__name">{{ k.name }}</span><span class="chud-row__note">{{ k.note }}</span></div>
+    <form method="post" action="{{ url }}" data-write="close" data-label="Send {{ k.name }}"><input type="hidden" name="sticker" value="{{ k.id }}"><input type="hidden" name="pay" value="{% if k.have %}owned{% else %}buy{% endif %}"><input type="hidden" name="token" value="{{ token }}"><button type="submit" class="chud-pay" aria-label="{% if k.have %}Send {{ k.name }}{% else %}Buy and send {{ k.name }}{% endif %}"{% if k.too_poor %} disabled{% endif %}>{% if k.have %}Send{% else %}{{ k.price }} pts{% endif %}</button></form>
+  </div>{% endfor %}
+</div>
+<a class="text-btn" href="{% url 'chud:store' %}">Open the CHUD store</a>
+{% endblock %}

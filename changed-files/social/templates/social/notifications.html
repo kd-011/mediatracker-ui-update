@@ -1,0 +1,16 @@
+{% extends "core/shell.html" %}
+{% load ui %}
+{% block title %}Notifications · MediaTracker{% endblock %}
+{% block content %}
+<div class="stack">
+  <a class="back" href="{% url 'accounts:me' %}">{% icon "back" 20 %}<span>Profile</span></a>
+  <h1 class="h1">Notifications</h1>
+  {% if events %}
+  <ul class="menu">
+    {% for e in events %}<li><a class="menu__row notif__row" {% if e.url %}href="{{ e.url }}"{% else %}href="{% url 'accounts:me' %}"{% endif %}><span>{{ e.text }}</span><span class="muted">{{ e.when|timesince }} ago</span></a></li>{% endfor %}
+  </ul>
+  {% else %}
+  <p class="muted">Nothing yet. Follows, likes, comments, stickers and bounties land here.</p>
+  {% endif %}
+</div>
+{% endblock %}

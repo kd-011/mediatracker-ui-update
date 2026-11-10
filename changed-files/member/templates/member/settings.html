@@ -1,0 +1,84 @@
+{% extends "core/shell.html" %}
+{% load ui %}
+{% block title %}Settings · MediaTracker{% endblock %}
+{% block content %}
+<div class="stack settings">
+  <a class="back" href="{% url 'accounts:me' %}">{% icon "back" 20 %}<span>Profile</span></a>
+  <h1 class="h1">Settings</h1>
+
+  <section class="settings__group" aria-labelledby="me-h">
+    <h2 class="h2" id="me-h">Me</h2>
+    <div class="settings__picture">
+      <button type="button" class="me__avatar me__avatar--toggle" data-avatar-toggle aria-expanded="{% if user.avatar_path %}false{% else %}true{% endif %}" aria-controls="avatar-picker" aria-label="Change your picture">{% if user.avatar_path %}<img src="{{ user.avatar_url }}" alt="" width="72" height="72">{% else %}{{ user.initial }}{% endif %}</button>
+      <form method="post" action="{% url 'member:profile' %}" class="form" novalidate data-busy-form data-busy-text="Saving…">
+        {% csrf_token %}
+        {% include "core/components/field.html" with field=profile_form.display_name %}
+        {% include "core/components/field.html" with field=profile_form.username %}
+        <button type="submit" class="btn btn--outline" data-busy-button>Save</button>
+      </form>
+    </div>
+    <div id="avatar-picker" data-avatar-picker {% if user.avatar_path %}hidden{% endif %} class="settings__picker">
+      <form method="post" action="{% url 'member:avatar' %}" enctype="multipart/form-data" class="form" novalidate data-autosave data-busy-form data-busy-text="Uploading…">
+        {% csrf_token %}
+        <label class="btn btn--outline settings__file">Upload picture<input type="file" name="file" accept="image/*" hidden></label>
+        <span class="field__error" aria-live="polite">{% for e in avatar_form.file.errors %}{{ e }}{% if not forloop.last %} {% endif %}{% endfor %}</span>
+      </form>
+      <p class="settings__stock-label">Or pick one</p>
+      <div class="avatar-stock">
+        {% for key in stock_avatars %}<form method="post" action="{% url 'member:avatar_stock' %}">{% csrf_token %}<input type="hidden" name="avatar" value="{{ key }}"><button type="submit" class="avatar-stock__one{% if user.avatar_path == 'stock:'|add:key %} is-active{% endif %}" aria-label="Use the {{ key }} avatar"><img src="{% url 'member:stock_avatar' key %}" alt="" width="48" height="48" loading="lazy"></button></form>{% endfor %}
+      </div>
+      {% if user.avatar_path %}<form method="post" action="{% url 'member:avatar_remove' %}">{% csrf_token %}<button type="submit" class="btn btn--ghost btn--small">Remove picture</button></form>{% endif %}
+    </div>
+  </section>
+
+  <section class="settings__group" aria-labelledby="prefs-h">
+    <h2 class="h2" id="prefs-h">Preferences</h2>
+    <form method="post" action="{% url 'member:preferences' %}" class="form" novalidate data-busy-form data-busy-text="Saving…">
+      {% csrf_token %}
+      {% include "core/components/field.html" with field=preferences_form.title_language %}
+      {% include "core/components/field.html" with field=preferences_form.default_visibility %}
+      <label class="check">{{ preferences_form.show_adult }}<span>{{ preferences_form.show_adult.label }}</span></label>
+      <button type="submit" class="btn btn--primary" data-busy-button>Save</button>
+    </form>
+  </section>
+
+  <section class="settings__group" aria-labelledby="more-h">
+    <h2 class="h2" id="more-h">More</h2>
+    <ul class="menu">
+      <li><a class="menu__row" href="{% url 'social:people' %}">Find people</a></li>
+      <li><a class="menu__row" href="{% url 'imports:index' %}">Import from MAL or Letterboxd</a></li>
+      {% if user.is_admin %}<li><a class="menu__row" href="{% url 'accounts:manage' %}">Manage members and codes</a></li>{% endif %}
+      <li><a class="menu__row" href="{% url 'core:about' %}">About</a></li>
+    </ul>
+  </section>
+
+  <section class="settings__group" aria-labelledby="password-h">
+    <h2 class="h2" id="password-h">Change password</h2>
+    <form method="post" action="{% url 'member:password' %}" class="form" novalidate data-busy-form data-busy-text="Changing password…">
+      {% csrf_token %}
+      {% include "core/components/form_errors.html" with form=password_form %}
+      {% include "core/components/field.html" with field=password_form.current %}
+      {% include "core/components/field.html" with field=password_form.new %}
+      {% include "core/components/field.html" with field=password_form.again %}
+      <button type="submit" class="btn btn--primary" data-busy-button>Change password</button>
+    </form>
+  </section>
+
+  <section class="settings__group" aria-labelledby="export-h">
+    <h2 class="h2" id="export-h">Export</h2>
+    <ul class="menu">
+      {% for file, label, kind in exports %}<li><a class="menu__row" href="{% url 'member:export' file %}" download>{{ label }}<span class="muted">{{ kind }}</span></a></li>{% endfor %}
+    </ul>
+  </section>
+
+  <form method="post" action="{% url 'accounts:logout' %}">
+    {% csrf_token %}
+    <button type="submit" class="btn btn--outline btn--block">Sign out</button>
+  </form>
+
+  <section class="settings__group" aria-labelledby="delete-h">
+    <h2 class="h2" id="delete-h">Delete account</h2>
+    <a class="btn btn--danger btn--block" href="{% url 'member:delete' %}">Delete account…</a>
+  </section>
+</div>
+{% endblock %}

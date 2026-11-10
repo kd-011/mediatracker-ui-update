@@ -1,0 +1,7 @@
+{% load catalogue %}{% for card in cards %}
+<a class="me__grid-item" href="{% url 'catalogue:title' card.post.media_id %}" aria-label="{{ card.title }}">
+  {% if card.post.media.poster_key %}<img data-poster src="{% poster_src card.post.media.poster_key %}" alt="{{ card.title }}" loading="lazy" decoding="async">{% endif %}
+  <span class="me__grid-badge">{{ card.post.get_outcome_display }}</span>
+</a>
+{% endfor %}
+{% if next_url %}<div class="skeleton-row me__grid-more" hx-get="{{ next_url }}&view=grid" hx-trigger="revealed" hx-swap="outerHTML" aria-hidden="true"><span class="skeleton skeleton--poster"></span><span class="skeleton-row__lines"><span class="skeleton skeleton--line"></span><span class="skeleton skeleton--short"></span></span></div>{% endif %}

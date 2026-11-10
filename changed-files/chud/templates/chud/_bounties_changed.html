@@ -1,0 +1,7 @@
+{% load ui catalogue %}<div id="chud-bounties"{% if not chud.bounties_on_me and not chud.bounties_i_set %} hidden{% endif %} hx-swap-oob="true">
+  {% if chud.bounties_on_me or chud.bounties_i_set %}<div class="chud-bounties">
+  {% for bounty in chud.bounties_on_me %}{% title_of bounty.media as shown %}{% include "chud/_bounty_card.html" with bounty=bounty %}{% endfor %}
+  {% for bounty in chud.bounties_i_set %}{% title_of bounty.media as shown %}{% include "chud/_bounty_card.html" with bounty=bounty sent=True %}{% endfor %}
+  </div>{% endif %}
+</div>
+{% include "chud/_points.html" with oob=True points=chud.points points_text=chud.points_text %}

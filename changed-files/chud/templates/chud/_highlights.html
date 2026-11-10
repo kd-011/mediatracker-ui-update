@@ -1,0 +1,11 @@
+{% load ui %}{% if chud.crowned %}<div class="me__highlights">
+  <div class="me__highlight" aria-label="Chud of the Week">
+    <span class="me__highlight-ring me__highlight-ring--accent">{% icon "crown" 24 %}</span>
+    <span class="me__highlight-label">Chud of the Week</span>
+  </div>
+</div>{% endif %}
+{% if chud.mine or chud.buddy_now %}
+<div class="chud-detail">
+  {% include "chud/_profile.html" %}
+</div>
+{% endif %}

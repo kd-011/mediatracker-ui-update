@@ -1,0 +1,38 @@
+{% extends "core/base.html" %}
+{% load static ui %}
+{% block body %}
+<a class="skip" href="#main">Skip to content</a>
+<header class="topbar">
+  <form class="search" role="search" action="{% url 'core:search' %}" method="get">
+    <span class="search__icon">{% icon "search" 18 %}</span>
+    <input type="search" name="q" value="{{ query|default:'' }}" aria-label="Search titles" placeholder="Search movies, TV, anime, manga" autocomplete="off" enterkeyhint="search" maxlength="100"
+           hx-get="{% url 'core:search' %}" hx-trigger="input changed delay:180ms, search" hx-target="#search-panel" hx-swap="innerHTML" hx-sync="this:replace" hx-indicator="closest .search">
+  </form>
+  {% if request.path == '/me/' %}<a class="topbar-bell" href="{% url 'social:notifications' %}" aria-label="Notifications">{% icon "bell" 22 %}</a><a class="topbar-cog" href="{% url 'member:settings' %}" aria-label="Settings">{% icon "cog" 22 %}</a>{% else %}<a class="avatar" href="{% url 'accounts:me' %}" aria-label="Profile">{% if user.avatar_path %}<img src="{{ user.avatar_url }}" alt="" width="44" height="44">{% else %}{{ user.initial }}{% endif %}</a>{% endif %}
+</header>
+<div id="offline" class="offline" role="status" hidden>You're offline. What you have already opened still works.</div>
+<div id="write-error" class="write-error" role="alert" hidden>
+  <p><strong data-what></strong> <small data-why></small></p>
+  <div class="write-error__buttons">
+    <button type="button" class="btn btn--small btn--outline" data-retry>Try again</button>
+    <button type="button" class="btn btn--small btn--ghost" data-dismiss>Dismiss</button>
+  </div>
+</div>
+<div id="search-panel" class="search-panel" aria-live="polite">{% block search_panel %}{% endblock %}</div>
+<main id="main" class="page">
+  {% block content %}{% endblock %}
+  {% block footer %}{% include "core/components/attribution.html" %}{% endblock %}
+</main>
+<nav class="tabbar" aria-label="Main">
+  {% include "core/components/tab.html" with name="home" url="/" label="Home" %}
+  {% include "core/components/tab.html" with name="currently" url="/currently/" label="Currently" %}
+  <button type="button" class="tabbar__add" aria-label="Quick log" aria-haspopup="dialog"
+          hx-get="{% url 'core:quick_log' %}" hx-target="#sheet-host" hx-swap="innerHTML">
+    {% icon "plus" 26 %}
+  </button>
+  {% include "core/components/tab.html" with name="library" url="/library/" label="Library" %}
+  {% include "core/components/tab.html" with name="feed" url="/feed/" label="Feed" %}
+</nav>
+<div id="sheet-host"></div>
+{% if chud_level_up_pending %}<div hidden data-level-up="{% url 'chud:level_up' %}"></div>{% endif %}
+{% endblock %}
